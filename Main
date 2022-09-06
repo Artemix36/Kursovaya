@@ -1,0 +1,272 @@
+#include <iostream>
+#include <string>
+#include <clocale>
+#include <Windows.h>
+#include <cstdlib>
+
+using namespace std;
+
+unsigned int keyv = 0;
+
+struct Node
+{
+    string field;
+    unsigned int key;
+    Node* next, * prev;
+};
+
+void Print(Node* Head)
+{
+    Node* temp = Head;
+    int k = 1;
+    cout << "           Список\nНомер         Место        Значение" << endl;
+    do
+    {
+        cout << "  " << k << "            " << temp->key << "           " << temp->field << endl;
+        k++;
+        temp = temp->next;
+    } while (temp != Head);
+    cout << "\n Всего элементов в списке: " << k - 1 << endl;;
+}
+
+void AddFirst(Node** Head, string a)
+{
+    Node* temp = new Node;
+    temp->field = a;
+    if (*Head != NULL)
+    {
+        temp->next = *Head;
+        temp->prev = (*Head)->prev;
+        temp->key = keyv;
+        (*Head)->prev->next = temp;
+        (*Head)->prev = temp;
+        (*Head) = temp;
+    }
+    else
+    {
+        *Head = temp;
+        (*Head)->next = *Head;
+        (*Head)->prev = *Head;
+        (*Head)->key = keyv;
+    }
+    keyv++;
+}
+
+void DeleteFirst(Node** Head)
+{
+    Node* temp = *Head;
+    if ((*Head)->next != *Head)
+    {
+        *Head = temp->next;
+        (*Head)->prev = temp->prev;
+        temp->prev->next = *Head;
+    }
+    else
+        *Head = NULL;
+    delete temp;
+}
+
+int Count(Node* Head)
+{
+    Node* temp = Head;
+    int count = 0;
+    do
+    {
+        temp = temp->next;
+        count++;
+    } while (temp != Head);
+    return count;
+}
+
+void DeleteList(Node** Head)
+{
+    Node* temp = *Head;
+    Node* del = *Head;
+    (*Head)->prev->next = NULL;
+    while (temp)
+    {
+        del = temp;
+        temp = temp->next;
+        delete del;
+    }
+    keyv = 0;
+}
+
+void Change(Node* Head, string a, int k)
+{
+    Node* temp = Head;
+    int m = 0;
+    do
+    {
+        if (temp->key == k)
+        {
+            m = 1;
+            temp->field = a;
+            temp->key = keyv;
+            keyv++;
+            break;
+        }
+        temp = temp->next;
+    } while (temp != Head);
+    if (m == 1)
+        cout << "Элемент успешно заменён." << endl;
+    else cout << "Элемента с таким ключом не существует." << endl;
+}
+
+int menu()
+{
+    cout << "> ";
+    int n;
+    cin >> n;
+    if (cin.fail())
+    {
+        cin.clear();
+        cin.ignore(32767, '\n');
+    }
+    return n;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    int check = 0, choice, menucall = 1, k;
+    Node* Head = NULL;
+    string a;
+    cout << "Меню:" << endl;
+    cout << "1. Создать пустой список" << endl;
+    cout << "2. Посчитать количество элементов" << endl;
+    cout << "3. Вывести весь список" << endl;
+    cout << "4. Вставить элемент в начало" << endl;
+    cout << "5. Удалить элемент из начала" << endl;
+    cout << "6. Заменить элемент на определенном месте" << endl;
+    cout << "7. Удалить списка" << endl;
+    cout << "8. Выход" << endl;
+    while (menucall == 1)
+    {
+        choice = menu();
+        switch (choice)
+        {
+        case 1:
+            if (check == 0)
+            {
+                Head = NULL;
+                cout << "Пустой список успешно создан." << endl;
+                check = 1;
+                break;
+                
+            }
+            else cout << "Список уже существует. Удалите старый, чтобы создать новый." << endl;
+            break;
+        case 2:
+            if (check == 0)
+            {
+                cout << "Ошибка. Списка не существует." << endl;
+                
+            }
+            if (Head == NULL)
+            {
+                cout << "Элементов в списке: 0" << endl;
+                
+            }
+            cout << "Элементов в списке: " << Count(Head) << endl;
+            break;
+
+        case 3:
+            if (check == 0)
+            {
+                cout << "Ошибка. Списка не существует." << endl;
+                break;
+                
+            }
+            if (Head == NULL)
+            {
+                cout << "Список пустой." << endl;
+                break;
+                
+            }
+            Print(Head);
+            break;
+            
+        case 4:
+            if (check == 0)
+            {
+                cout << "Ошибка. Списка не существует." << endl;
+                break;
+                
+            }
+            cout << "Введите значение элемента: ";
+            cin >> a;
+            AddFirst(&Head, a);
+            break;
+
+        case 5:
+            if (check == 0)
+            {
+                cout << "Ошибка. Списка не существует." << endl;
+                break;
+                
+            }
+            if (Head == NULL)
+            {
+                cout << "Список пустой." << endl;
+                break;
+                
+            }
+            DeleteFirst(&Head);
+            cout << "Первый элемент успешно удалён." << endl;
+            break;
+            
+        case 6:
+            if (check == 0)
+            {
+                cout << "Ошибка. Списка не существует." << endl;
+                break;
+                
+            }
+            if (Head == NULL)
+            {
+                cout << "Ошибка. Список пустой." << endl;
+                break;
+                
+            }
+            cout << "Введите элемент: ";
+            cin>>a;
+            cout << "Введите ключ заменяемого элемента:\n-";
+            cin >> k;
+            Change(Head, a, k);
+            break;
+            
+        case 7:
+            if (check == 0)
+            {
+                cout << "Ошибка. Списка не существует." << endl;
+                break;
+                
+            }
+            if (Head == NULL)
+            {
+                cout << "Ошибка. Список и так пустой." << endl;
+                break;
+                
+            }
+            DeleteList(&Head);
+            cout << "Список успешно удалён." << endl;
+            check = 0;
+            break;
+            
+        case 8:
+            menucall = 0;
+            break;
+            
+        default:
+            cout << "Try again" << endl;
+            break;
+            
+        }
+    }
+    cout << "See you space cowboy!" << endl;
+
+    return 0;
+}
